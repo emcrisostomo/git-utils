@@ -114,7 +114,7 @@ version.texi
 # Template files
 Doxyfile
 build-aux/create-pot-template.sh
-scripts/mvn-version
+scripts/git-outgoing
 
 # Output files
 
