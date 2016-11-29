@@ -54,7 +54,7 @@ git-outgoing
 
 The syntax to invoke `git-outgoing` is the following:
 
-    $ git-outgoing (options)* (path)+
+    $ git-outgoing (options)* (path)*
 
 The available options are:
 
@@ -62,7 +62,7 @@ The available options are:
   * `-v, --verbose`: to print the summary of the outgoing changesets.
   * `--version`: to print the program version.
 
-`path` is the root path of git repository.
+`path` is the root path of git repository.  If no path is given, `.` is used.
 
 Examples
 --------

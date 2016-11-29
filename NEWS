@@ -1,6 +1,11 @@
 NEWS
 ****
 
+New in 1.1.0:
+
+  * Add -a, --all to print outgoing changes on any branch.
+  * Use current directory if no arguments are given.
+
 New in 1.0.0:
 
   * Check whether a repository has changesets to push.
