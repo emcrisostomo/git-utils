@@ -107,18 +107,26 @@ for repo in $*
 do
   if [[ ! -d ${repo}/.git ]]
   then
-    >&2 print -- ${repo}: not a Git repository. Skipping.
+    >&2 print -- ${repo}: not a Git repository.
     continue
   fi
 
   GIT=( git -C ${repo} )
 
-  UPSTREAM_BRANCH=$(${GIT} for-each-ref --format='%(upstream:short)' $(${GIT} symbolic-ref -q HEAD))
+  HEAD_REF=$(${GIT} rev-parse --symbolic-full-name HEAD)
+
+  if [[ ${HEAD_REF} == "HEAD" ]]
+  then
+    >&2 print -- "${repo}: detached HEAD"
+    continue
+  fi
+
+  UPSTREAM_BRANCH=$(${GIT} for-each-ref --format='%(upstream:short)' ${HEAD_REF})
 
   [[ -n ${UPSTREAM_BRANCH} ]] ||
 
     {
-      >&2 print -- Project ${repo} is in a branch whose upstream is not configured
+      >&2 print -- "${repo}: upstream not configured"
       continue
     }
 
