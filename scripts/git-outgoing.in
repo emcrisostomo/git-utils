@@ -43,9 +43,10 @@ print_usage()
   print -- "${PROGNAME}"
   print
   print -- "Usage:"
-  print -- "${PROGNAME} path ..."
+  print -- "${PROGNAME} (path)*"
   print
   print -- "Options:"
+  print -- " -a, --all      Consider all branches."
   print -- " -h, --help     Print this message."
   print -- " -v, --verbose  Print verbose output."
   print -- "     --version  Print the program version."
@@ -100,11 +101,7 @@ fi
 
 parse_opts $* && shift ${ARGS_PROCESSED}
 
-(( $# == 0 )) &&
-  {
-    >&2 print -- Missing argument.
-    exit 1
-  }
+(( $# == 0 )) && set -- .
 
 if (( ${VERBOSE} > 0 ))
 then
