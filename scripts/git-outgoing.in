@@ -1,0 +1,158 @@
+#!@ZSH_CMD@
+# -*- vim:fenc=utf-8:et:sw=2:ts=2:sts=2
+#
+setopt local_options
+setopt local_traps
+unsetopt glob_subst
+
+set -o errexit
+set -o nounset
+
+PROGNAME=${0:t}
+PROGDIR=${0:h}
+BUG_REPORT=@PACKAGE_BUGREPORT@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+typeset -i ARGS_PROCESSED=0
+typeset -a help_flag verbose_flag version_flag
+VERBOSE=0
+
+REQUIRED_PROGS=( git )
+
+for p in ${REQUIRED_PROGS}
+do
+  command -v ${p} > /dev/null 2>&1 ||
+    {
+      >&2 print -- Cannot find required program: ${p}
+      exit 1
+    }
+done
+
+print_version()
+{
+  print -- "${PROGNAME} ${PACKAGE_VERSION}"
+  print -- "Copyright (C) 2016 Enrico M. Crisostomo"
+  print -- "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
+  print -- "This is free software: you are free to change and redistribute it."
+  print -- "There is NO WARRANTY, to the extent permitted by law."
+  print
+  print -- "Written by Enrico M. Crisostomo"
+}
+
+print_usage()
+{
+  print -- "${PROGNAME}"
+  print
+  print -- "Usage:"
+  print -- "${PROGNAME} path ..."
+  print
+  print -- "Options:"
+  print -- " -h, --help     Show this message."
+  print -- " -v, --verbose  Print verbose output."
+}
+
+parse_opts()
+{
+  while getopts ":" opt
+  do
+    case $opt in
+      \?)
+        >&2 print -- Invalid option -${OPTARG}.
+        exit 1
+        ;;
+    esac
+  done
+
+  ARGS_PROCESSED=$((OPTIND - 1))
+}
+
+# main
+zparseopts -D \
+           h=help_flag -help=help_flag \
+           v=verbose_flag -verbose=verbose_flag \
+           -version=version_flag
+
+if (( ${+help_flag[1]} > 0 ))
+then
+  print_usage
+  exit 0
+fi
+
+if (( ${+verbose_flag[1]} > 0 ))
+then
+  VERBOSE=1
+fi
+
+if (( ${+version_flag[1]} > 0 ))
+then
+  print_version
+  exit 0
+fi
+
+parse_opts $* && shift ${ARGS_PROCESSED}
+
+(( $# == 0 )) &&
+  {
+    >&2 print -- Missing argument.
+    exit 1
+  }
+
+if (( ${VERBOSE} > 0 ))
+then
+  verboseprint=print
+else
+  verboseprint=:
+fi
+
+for repo in $*
+do
+  if [[ ! -d ${repo}/.git ]]
+  then
+    >&2 print -- ${repo}: not a Git repository.
+    continue
+  fi
+
+  GIT=( git -C ${repo} )
+
+  HEAD_REF=$(${GIT} rev-parse --symbolic-full-name HEAD)
+
+  if [[ ${HEAD_REF} == "HEAD" ]]
+  then
+    >&2 print -- "${repo}: detached HEAD"
+    continue
+  fi
+
+  UPSTREAM_BRANCH=$(${GIT} for-each-ref --format='%(upstream:short)' ${HEAD_REF})
+
+  [[ -n ${UPSTREAM_BRANCH} ]] ||
+
+    {
+      >&2 print -- "${repo}: upstream not configured"
+      continue
+    }
+
+  OUTGOING_CHANGESETS=( "${(f)$(${GIT} log --pretty=oneline --abbrev-commit --graph @{u}..)}" )
+
+  (( ${#OUTGOING_CHANGESETS} == 0 )) && continue
+
+  if (( ${#OUTGOING_CHANGESETS} == 1 )) && [[ -z ${OUTGOING_CHANGESETS} ]]
+  then
+    continue
+  fi
+
+  print -- ${repo}
+
+  for cs in ${OUTGOING_CHANGESETS}
+  do
+    ${verboseprint} -- "  " ${cs}
+  done
+done
+
+# Local variables:
+# coding: utf-8
+# mode: sh
+# eval: (sh-set-shell "zsh")
+# tab-width: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# sh-indentation: 2
+# End:
