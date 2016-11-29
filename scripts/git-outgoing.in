@@ -13,9 +13,9 @@ PROGDIR=${0:h}
 BUG_REPORT=@PACKAGE_BUGREPORT@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 typeset -i ARGS_PROCESSED=0
-typeset -a help_flag verbose_flag version_flag
+typeset -a all_flag help_flag verbose_flag version_flag
 VERBOSE=0
-
+OUTGOING_CHANGESETS=
 REQUIRED_PROGS=( git )
 
 for p in ${REQUIRED_PROGS}
@@ -46,8 +46,9 @@ print_usage()
   print -- "${PROGNAME} path ..."
   print
   print -- "Options:"
-  print -- " -h, --help     Show this message."
+  print -- " -h, --help     Print this message."
   print -- " -v, --verbose  Print verbose output."
+  print -- "     --version  Print the program version."
 }
 
 parse_opts()
@@ -65,8 +66,17 @@ parse_opts()
   ARGS_PROCESSED=$((OPTIND - 1))
 }
 
+print_changesets()
+{
+  for cs in ${OUTGOING_CHANGESETS}
+  do
+    ${verboseprint} -- "  " ${cs}
+  done
+}
+
 # main
 zparseopts -D \
+           a=all_flag -all=all_flag \
            h=help_flag -help=help_flag \
            v=verbose_flag -verbose=verbose_flag \
            -version=version_flag
@@ -113,6 +123,21 @@ do
 
   GIT=( git -C ${repo} )
 
+  # If --all is specified, just use git log
+  if (( ${+all_flag[1]} > 0 ))
+  then
+    OUTGOING_CHANGESETS=( "${(f)$(${GIT} log --pretty=oneline --abbrev-commit --graph --branches --not --remotes=\*)}" )
+    (( ${#OUTGOING_CHANGESETS} == 0 )) && continue
+
+    print -- ${repo}
+    print_changesets
+
+    continue
+  fi
+
+  # Otherwise we have to check:
+  #   - Whether the HEAD is detached, in which case HEAD has no upstreams.
+  #   - Whether the upstream is configured, in which case @{u} is not defined.
   HEAD_REF=$(${GIT} rev-parse --symbolic-full-name HEAD)
 
   if [[ ${HEAD_REF} == "HEAD" ]]
@@ -140,11 +165,7 @@ do
   fi
 
   print -- ${repo}
-
-  for cs in ${OUTGOING_CHANGESETS}
-  do
-    ${verboseprint} -- "  " ${cs}
-  done
+  print_changesets
 done
 
 # Local variables:
