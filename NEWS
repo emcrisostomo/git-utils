@@ -6,3 +6,4 @@ New in 1.0.0:
   * Check whether a repository has changesets to push.
   * List the changesets to push.
   * Detect whether a branch has no remote configured.
+  * Detect whether HEAD is detached
