@@ -135,7 +135,7 @@ do
   # Otherwise we have to check:
   #   - Whether the HEAD is detached, in which case HEAD has no upstreams.
   #   - Whether the upstream is configured, in which case @{u} is not defined.
-  HEAD_REF=$(${GIT} rev-parse --symbolic-full-name HEAD)
+  HEAD_REF=$(${GIT} rev-parse --symbolic-full-name HEAD 2> /dev/null || true)
 
   if [[ ${HEAD_REF} == "HEAD" ]]
   then
