@@ -15,9 +15,9 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-dnl Copyright (C) 2016 Enrico M. Crisostomo
+dnl Copyright (C) 2016-2018 Enrico M. Crisostomo
 AC_PREREQ([2.69])
-AC_INIT([git-utils], [1.2.0], [enrico.m.crisostomo@gmail.com])
+AC_INIT([git-utils], [1.3.0], [enrico.m.crisostomo@gmail.com])
 AC_COPYRIGHT([2016-2018 (C) Enrico M. Crisostomo])
 AC_REVISION([$Revision: 1.0.0$])
 AC_CONFIG_SRCDIR([scripts/git-outgoing.in])
