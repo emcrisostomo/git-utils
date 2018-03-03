@@ -115,10 +115,20 @@ do
       {
         >&2 print -- "Skipping non-directory: $i"
         continue
-    }
+      }
 
     ${verboseprint} -- $i
     git -C $i pull
     ${verboseprint} --
   done
 done
+
+# Local variables:
+# coding: utf-8
+# mode: sh
+# eval: (sh-set-shell "zsh")
+# tab-width: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# sh-indentation: 2
+# End:
