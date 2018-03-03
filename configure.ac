@@ -1,5 +1,5 @@
 #                                               -*- Autoconf -*-
-# Copyright (C) 2016 Enrico M. Crisostomo
+# Copyright (C) 2016-2018 Enrico M. Crisostomo
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -18,13 +18,15 @@
 dnl Copyright (C) 2016 Enrico M. Crisostomo
 AC_PREREQ([2.69])
 AC_INIT([git-utils], [1.2.0], [enrico.m.crisostomo@gmail.com])
-AC_COPYRIGHT([2016 (C) Enrico M. Crisostomo])
+AC_COPYRIGHT([2016-2018 (C) Enrico M. Crisostomo])
 AC_REVISION([$Revision: 1.0.0$])
 AC_CONFIG_SRCDIR([scripts/git-outgoing.in])
+AC_CONFIG_SRCDIR([scripts/git-pull-all.in])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/git-outgoing], [chmod +x scripts/git-outgoing])
+AC_CONFIG_FILES([scripts/git-pull-all], [chmod +x scripts/git-pull-all])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_MACRO_DIR([m4])
 

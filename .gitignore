@@ -115,6 +115,7 @@ version.texi
 Doxyfile
 build-aux/create-pot-template.sh
 scripts/git-outgoing
+scripts/git-pull-all
 
 # Output files
 

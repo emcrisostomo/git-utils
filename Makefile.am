@@ -18,7 +18,8 @@ ACLOCAL_AMFLAGS = -I m4
 dist_doc_DATA  = README.md README.gnu-build-system
 dist_doc_DATA += AUTHORS CONTRIBUTING.md COPYING LICENSE NEWS
 
-bin_SCRIPTS = scripts/git-outgoing
+bin_SCRIPTS  = scripts/git-outgoing
+bin_SCRIPTS += scripts/git-pull-all
 
 dist-hook:
 # The recipe cannot assume a file in $(distdir) is writable.

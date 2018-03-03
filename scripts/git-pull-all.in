@@ -1,0 +1,124 @@
+#!@ZSH_CMD@
+# -*- vim:fenc=utf-8:et:sw=2:ts=2:sts=2
+#
+setopt local_options
+setopt local_traps
+unsetopt glob_subst
+
+set -o errexit
+set -o nounset
+
+PROGNAME=${0:t}
+PROGDIR=${0:h}
+BUG_REPORT=@PACKAGE_BUGREPORT@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+typeset -i ARGS_PROCESSED=0
+typeset -a help_flag verbose_flag version_flag
+VERBOSE=0
+REQUIRED_PROGS=( git )
+typeset -a git_repos_dir
+
+for p in ${REQUIRED_PROGS}
+do
+  command -v ${p} > /dev/null 2>&1 ||
+    {
+      >&2 print -- Cannot find required program: ${p}
+      exit 1
+    }
+done
+
+print_version()
+{
+  print -- "${PROGNAME} ${PACKAGE_VERSION}"
+  print -- "Copyright (C) 2016-2018 Enrico M. Crisostomo"
+  print -- "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
+  print -- "This is free software: you are free to change and redistribute it."
+  print -- "There is NO WARRANTY, to the extent permitted by law."
+  print
+  print -- "Written by Enrico M. Crisostomo"
+}
+
+print_usage()
+{
+  print -- "${PROGNAME}"
+  print
+  print -- "Usage:"
+  print -- "${PROGNAME} (path)*"
+  print
+  print -- "Options:"
+  print -- " -h, --help     Print this message."
+  print -- " -v, --verbose  Print verbose output."
+  print -- "     --version  Print the program version."
+}
+
+parse_opts()
+{
+  while getopts ":" opt
+  do
+    case $opt in
+      \?)
+        >&2 print -- Invalid option -${OPTARG}.
+        exit 1
+        ;;
+    esac
+  done
+
+  ARGS_PROCESSED=$((OPTIND - 1))
+}
+
+# main
+zparseopts -D \
+           h=help_flag    -help=help_flag \
+           v=verbose_flag -verbose=verbose_flag \
+                          -version=version_flag
+
+if (( ${+help_flag[1]} > 0 ))
+then
+  print_usage
+  exit 0
+fi
+
+if (( ${+verbose_flag[1]} > 0 ))
+then
+  VERBOSE=1
+fi
+
+if (( ${+version_flag[1]} > 0 ))
+then
+  print_version
+  exit 0
+fi
+
+parse_opts $* && shift ${ARGS_PROCESSED}
+
+(( $# == 0 )) && set -- .
+
+if (( ${VERBOSE} > 0 ))
+then
+  verboseprint=print
+else
+  verboseprint=:
+fi
+
+if (( $# > 0 ))
+then
+  git_repos_dir=$*
+else
+  git_repos_dir=( . )
+fi
+
+for git_repo_dir in ${git_repos_dir}
+do
+  for i in ${git_repo_dir}/*
+  do
+    [[ -d ${i} ]] ||
+      {
+        >&2 print -- "Skipping non-directory: $i"
+        continue
+    }
+
+    ${verboseprint} -- $i
+    git -C $i pull
+    ${verboseprint} --
+  done
+done
