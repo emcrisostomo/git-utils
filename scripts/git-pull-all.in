@@ -118,7 +118,7 @@ do
       }
 
     ${verboseprint} -- $i
-    git -C $i pull
+    git -C $i pull || true
     ${verboseprint} --
   done
 done

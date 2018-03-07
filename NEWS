@@ -1,6 +1,10 @@
 NEWS
 ****
 
+New in 1.1.1:
+
+  * Let git-pull-all continue if an error occurrs while pulling a repository.
+
 New in 1.1.0:
 
   * Add -a, --all to print outgoing changes on any branch.
