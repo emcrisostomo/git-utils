@@ -3,7 +3,7 @@ NEWS
 
 New in 1.3.2:
 
-  * git-pull-all printa an error message indicating in which repository a git
+  * git-pull-all prints an error message indicating in which repository a git
     pull operation failed.
 
 New in 1.3.1:
